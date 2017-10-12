@@ -1,39 +1,39 @@
 PROG        =   dagger_kernel
 
-CC          =   /usr/bin/gcc
+CC          =   i686-elf-gcc
 NASM        =   /usr/bin/nasm
-LD          =   /usr/bin/ld
+LD          =   i686-elf-gcc
 RM          =   rm -f
 
-BINDIR      =   ./bin
-BOOTDIR     =   ./src
-OBJDIR      =   ./object
+BINDIR      =   bin
+BOOTDIR     =   boot
+OBJDIR      =   object
 
-SRCASM      =   $(BOOTDIR)/boot.S
-SRCC        =   $(BOOTDIR)/kernel.c
+SRCASM      =   $(wildcard $(BOOTDIR)/*.S)
+SRCC        =   $(wildcard $(BOOTDIR)/*.c)
 OBJSASM     =   $(addprefix $(OBJDIR)/,$(patsubst %.S,%.o,$(notdir $(SRCASM))))
 OBJSC       =   $(addprefix $(OBJDIR)/,$(patsubst %.c,%.o,$(notdir $(SRCC))))
 
 CFLAGS      =   -m32 -std=gnu99 -ffreestanding -O2 -Wall -Wextra
-LFLAGS      =   -m32
+LFLAGS      =   -m32 -T linker.ld -ffreestanding -O2 -nostdlib -lgcc
 NASMFLAGS   =   -f elf32
 
 all: $(PROG)
 
-$(PROG): $(OBJSASM)
-    $(LD) $(LFLAGS) $(OBJS) -o $(BINDIR)/$(PROG)
+$(PROG): $(OBJSASM) $(OBJSC)
+	$(LD) -o $(BINDIR)/$@ $^ $(LFLAGS)
 
 $(OBJDIR)/%.o: $(BOOTDIR)/%.S
-    $(NASM) $(NASMFLAGS) $(SRCASM)
+	$(NASM) -o $@ $< $(NASMFLAGS)
 
 $(OBJDIR)/%.o: $(BOOTDIR)/%.c
-    $(CC) $(CFLAGS) $(SRCC)
+	$(CC) -o $@ -c $< $(CFLAGS)
 
 fclean: clean
-    $(RM)   $(BINDIR)/$(PROG)
+	$(RM)   $(BINDIR)/$(PROG)
 
 clean:
-    $(RM)   $(OBJSASM) $(OBJSC)
+	$(RM)   $(OBJSASM) $(OBJSC)
 
 re: fclean all
 

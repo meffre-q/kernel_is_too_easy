@@ -2,7 +2,7 @@
 #include <stddef.h>
 #include <stdint.h>
 
-#if !defined(__linux__)
+#if defined(__linux__)
 #error "ERROR: Cross compilation failed. Use Linux !"
 #endif
 
@@ -29,8 +29,8 @@ enum vga_color {
     VGA_COLOR_WHITE         = 15,
 };
 
-VGA_WIDTH = 80;
-VGA_HEIGHT = 25;
+static const size_t VGA_WIDTH = 80;
+static const size_t VGA_HEIGHT = 25;
 
 size_t terminal_row;
 size_t terminal_column;
@@ -58,7 +58,7 @@ void    terminal_initialize(void) {
     }
 }
 
-size_t  strlen(char *str) {
+size_t  strlen(const char *str) {
     size_t  i = 0;
 
     while (str[i])
