@@ -10,11 +10,11 @@ BOOTDIR     =   ./src
 OBJDIR      =   ./object
 
 SRCASM      =   $(BOOTDIR)/boot.S
-SRCC        =   $(BOOTDIR)/...
+SRCC        =   $(BOOTDIR)/kernel.c
 OBJSASM     =   $(addprefix $(OBJDIR)/,$(patsubst %.S,%.o,$(notdir $(SRCASM))))
 OBJSC       =   $(addprefix $(OBJDIR)/,$(patsubst %.c,%.o,$(notdir $(SRCC))))
 
-CFLAGS      =   -m32
+CFLAGS      =   -m32 -std=gnu99 -ffreestanding -O2 -Wall -Wextra
 LFLAGS      =   -m32
 NASMFLAGS   =   -f elf32
 
