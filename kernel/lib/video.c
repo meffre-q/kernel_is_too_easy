@@ -14,6 +14,10 @@ terminal_put_entry_at(char c, uint8_t color, size_t x, size_t y) {
 static void
 terminal_putchar(char c) {
     terminal_put_entry_at(c, terminal_color, terminal_column, terminal_row);
+    if (c == '\n') {
+        terminal_row++;
+        terminal_column = -1;
+    }
     if (++terminal_column == VGA_WIDTH) {
         terminal_column = 0;
         if (++terminal_row == VGA_HEIGHT)

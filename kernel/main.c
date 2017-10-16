@@ -11,5 +11,6 @@
 
 void    kmain(void) {
     terminal_initialize();
-    kprint_str("Dagger's Kernel! (Guillaume swallows)\n");
+    kprint_str("Dagger's Kernel!\n");
+    kprint_str("TOTO\n");
 }
