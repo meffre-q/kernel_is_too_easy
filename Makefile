@@ -1,40 +1,38 @@
 PROG        =   dagger_kernel
 
-CC          =   i686-elf-gcc
-NASM        =   /usr/bin/nasm
 LD          =   i686-elf-gcc
 RM          =   rm -f
 
-BINDIR      =   bin
-BOOTDIR     =   boot
-OBJDIR      =   object
+BINDIR      =   ./bin/
+BOOTDIR     =   ./boot/
+KERNELDIR   =   ./kernel/
+OBJDIR      =   ./object/
 
-SRCASM      =   $(wildcard $(BOOTDIR)/*.S)
-SRCC        =   $(wildcard $(BOOTDIR)/*.c)
-OBJSASM     =   $(addprefix $(OBJDIR)/,$(patsubst %.S,%.o,$(notdir $(SRCASM))))
-OBJSC       =   $(addprefix $(OBJDIR)/,$(patsubst %.c,%.o,$(notdir $(SRCC))))
+OBJ		    =   $(wildcard $(OBJDIR)*.o)
 
-CFLAGS      =   -m32 -std=gnu99 -ffreestanding -O2 -Wall -Wextra
-LFLAGS      =   -m32 -T linker.ld -ffreestanding -O2 -nostdlib -lgcc
-NASMFLAGS   =   -f elf32
+LFLAGS      =   -T linker.ld -ffreestanding -O2 -nostdlib -lgcc
 
 all: $(PROG)
 
-$(PROG): $(OBJSASM) $(OBJSC)
-	$(LD) -o $(BINDIR)/$@ $^ $(LFLAGS)
+$(PROG): boot kernel
+	$(LD) -o $(BINDIR)$@ $(OBJ) $(LFLAGS)
 
-$(OBJDIR)/%.o: $(BOOTDIR)/%.S
-	$(NASM) -o $@ $< $(NASMFLAGS)
+boot:
+	$(MAKE) -C $(BOOTDIR) all
 
-$(OBJDIR)/%.o: $(BOOTDIR)/%.c
-	$(CC) -o $@ -c $< $(CFLAGS)
+kernel:
+	$(MAKE) -C $(KERNELDIR) all
+
+test:
+	grub-mkrescue -o $(BINDIR)$(PROG).iso test --xorriso=${HOME}/Downloads/xorriso/xorriso-1.4.6/xorriso/xorriso
 
 fclean: clean
-	$(RM)   $(BINDIR)/$(PROG)
+	$(RM)   $(BINDIR)$(PROG)
 
 clean:
-	$(RM)   $(OBJSASM) $(OBJSC)
+	$(MAKE) -C $(BOOTDIR) clean
+	$(MAKE) -C $(KERNELDIR) clean
 
 re: fclean all
 
-.PHONY: all clean fclean re
+.PHONY: all clean fclean re test boot kernel
